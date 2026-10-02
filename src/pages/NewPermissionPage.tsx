@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { IdhButton } from '../brand/Button'
 import { AppShell } from '../components/AppShell'
+import { FilePicker } from '../components/FilePicker'
 import {
   attachPhotoToPermission,
   createMedicalPermission,
@@ -142,17 +143,12 @@ export default function NewPermissionPage() {
             </label>
           )}
 
-          <label className="block">
-            <span className="text-sm font-bold" style={labelStyle}>
-              صورة إثبات (اختياري) {type !== 'medical' && '— صورة البصمة'}
+          <div>
+            <span className="text-sm font-bold block mb-1" style={labelStyle}>
+              مرفق إثبات (اختياري) {type !== 'medical' && '— صورة البصمة'}
             </span>
-            <input
-              type="file"
-              accept="image/*"
-              className="mt-1 w-full text-sm"
-              onChange={(e) => setPhoto(e.target.files?.[0] ?? null)}
-            />
-          </label>
+            <FilePicker file={photo} onChange={setPhoto} />
+          </div>
         </div>
 
         {error && (

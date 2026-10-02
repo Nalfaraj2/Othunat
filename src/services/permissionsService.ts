@@ -2,6 +2,7 @@ import { supabase } from '../lib/supabaseClient'
 import type { MedicalPermission, MonthlyBalance, Permission, PermissionType } from '../types/database'
 
 const ATTACHMENTS_BUCKET = 'attachments'
+const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024
 
 export class PermissionsServiceError extends Error {}
 
@@ -80,8 +81,17 @@ export async function uploadPhoto(file: File): Promise<string> {
   const { data: userData } = await supabase.auth.getUser()
   if (!userData.user) throw new PermissionsServiceError('يجب تسجيل الدخول أولًا')
 
-  const path = `${userData.user.id}/${crypto.randomUUID()}-${file.name}`
-  const { error } = await supabase.storage.from(ATTACHMENTS_BUCKET).upload(path, file)
+  if (file.size > MAX_ATTACHMENT_BYTES) {
+    throw new PermissionsServiceError('حجم الملف أكبر من 10 ميغابايت')
+  }
+
+  // Storage object keys must be plain ASCII (Arabic names / spaces are rejected), so never reuse
+  // the original file name — only its safe extension.
+  const ext = file.name.includes('.')
+    ? (file.name.split('.').pop() ?? '').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 8)
+    : ''
+  const path = `${userData.user.id}/${crypto.randomUUID()}${ext ? `.${ext}` : ''}`
+  const { error } = await supabase.storage.from(ATTACHMENTS_BUCKET).upload(path, file, { contentType: file.type || undefined })
   if (error) throw new PermissionsServiceError(error.message)
   return path
 }
