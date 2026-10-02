@@ -118,7 +118,8 @@ export default function DashboardPage() {
         aria-label="إضافة إذن"
         icon={<Icon name="add" />}
         onClick={() => navigate('/permissions/new')}
-        className="fixed left-5 bottom-24"
+        className="fixed left-5"
+        style={{ bottom: "calc(5.5rem + env(safe-area-inset-bottom))" }}
       />
     </AppShell>
   )

@@ -7,6 +7,8 @@ const config: CapacitorConfig = {
   appId: 'com.idhonat.app',
   appName: 'إذونات',
   webDir: 'dist',
+  // Matches the app background so no white/black flash shows while the webview loads or bounces.
+  backgroundColor: '#EEF1F6',
 }
 
 export default config

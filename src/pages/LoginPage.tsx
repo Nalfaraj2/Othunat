@@ -34,7 +34,7 @@ export default function LoginPage() {
   const inputStyle = { borderRadius: 'var(--idh-r-md)', borderColor: 'var(--idh-silver)' }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'var(--idh-mist)' }} dir="rtl">
+    <div className="min-h-dvh flex items-center justify-center px-page pt-page pb-page" style={{ background: 'var(--idh-mist)' }} dir="rtl">
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-sm bg-white p-6 space-y-5"

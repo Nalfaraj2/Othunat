@@ -2,9 +2,75 @@
 @import "./brand/fonts.css";
 @import "./brand/tokens.css";
 
+html {
+  /* iOS: stop text from being resized after rotation, and the grey flash on tap. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  background: var(--idh-mist);
+}
+
 body {
   margin: 0;
+  min-height: 100dvh;
   font-family: var(--idh-font);
   background: var(--idh-mist);
   color: var(--idh-ink);
+  overflow-x: hidden;
+  /* No rubber-band bounce revealing a different colour behind the page. */
+  overscroll-behavior-y: none;
+}
+
+/* iOS Safari zooms the whole page in when a field under 16px gets focus — and doesn't zoom back. */
+input,
+select,
+textarea {
+  font-size: 16px;
+}
+
+/* Removes the 300ms tap delay and double-tap-to-zoom on controls. */
+button,
+a,
+label,
+input,
+select,
+textarea {
+  touch-action: manipulation;
+}
+
+/* Segmented controls: keep 3-4 options inside a 375px screen (brand default is 16px padding). */
+.idh-seg {
+  width: 100%;
+}
+.idh-seg button {
+  flex: 1 1 0;
+  min-width: 0;
+  padding-inline: 6px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* Safe-area helpers (notch / Dynamic Island / home indicator). Needs viewport-fit=cover. */
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.px-safe {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Page gutters: at least 1rem, or the device inset if that is larger (e.g. iPhone landscape notch).
+   Use these instead of px-4/pt-4/pb-4 together with the *-safe helpers, which would override them. */
+.px-page {
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+}
+.pt-page {
+  padding-top: max(1rem, env(safe-area-inset-top));
+}
+.pb-page {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
 }
