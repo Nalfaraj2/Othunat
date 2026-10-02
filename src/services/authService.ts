@@ -36,7 +36,12 @@ export async function signUp(params: {
 export async function signInWithCivilId(civilId: string, password: string) {
   const email = await resolveEmail(civilId)
   const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-  if (error) throw new AuthServiceError('الرقم المدني أو كلمة المرور غير صحيحة')
+  if (error) {
+    if (error.code === 'email_not_confirmed' || /email not confirmed/i.test(error.message)) {
+      throw new AuthServiceError('يرجى تأكيد بريدك الإلكتروني أولًا عبر الرابط المرسل إليك ثم أعد المحاولة')
+    }
+    throw new AuthServiceError('الرقم المدني أو كلمة المرور غير صحيحة')
+  }
   return data
 }
 
