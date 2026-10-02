@@ -11,7 +11,7 @@ export default function TermsPage() {
         الشروط والأحكام
       </h1>
       <p className="text-sm" style={body}>
-        آخر تحديث: [التاريخ]. باستخدامك تطبيق "إذونات" فإنك توافقين على الشروط التالية.
+        آخر تحديث: ٢ أكتوبر ٢٠٢٦. باستخدامك تطبيق "إذونات" فإنك توافقين على الشروط التالية.
       </p>
 
       <h2 className="text-lg font-bold pt-2" style={heading}>
