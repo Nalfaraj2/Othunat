@@ -2,12 +2,15 @@ import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import logoStacked from '../assets/logo/idhonat-stacked-navy-on-white.svg'
 import { IdhButton } from '../brand/Button'
+import { PasswordInput } from '../components/PasswordInput'
+import { getRememberMe, getRememberedCivilId, setRememberedCivilId, setRememberMe } from '../lib/supabaseClient'
 import { AuthServiceError, signInWithCivilId } from '../services/authService'
 
 export default function LoginPage() {
   const navigate = useNavigate()
-  const [civilId, setCivilId] = useState('')
+  const [civilId, setCivilId] = useState(getRememberedCivilId)
   const [password, setPassword] = useState('')
+  const [remember, setRemember] = useState(getRememberMe)
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
@@ -16,7 +19,10 @@ export default function LoginPage() {
     setError(null)
     setSubmitting(true)
     try {
+      // Must be set before sign-in so the session is written to the right storage.
+      setRememberMe(remember)
       await signInWithCivilId(civilId, password)
+      setRememberedCivilId(remember ? civilId : null)
       navigate('/')
     } catch (err) {
       setError(err instanceof AuthServiceError ? err.message : 'حدث خطأ غير متوقع')
@@ -24,6 +30,8 @@ export default function LoginPage() {
       setSubmitting(false)
     }
   }
+
+  const inputStyle = { borderRadius: 'var(--idh-r-md)', borderColor: 'var(--idh-silver)' }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'var(--idh-mist)' }} dir="rtl">
@@ -44,9 +52,11 @@ export default function LoginPage() {
             الرقم المدني
           </span>
           <input
+            name="civil_id"
             className="mt-1 w-full p-3 border outline-none"
-            style={{ borderRadius: 'var(--idh-r-md)', borderColor: 'var(--idh-silver)' }}
+            style={inputStyle}
             inputMode="numeric"
+            autoComplete="off"
             maxLength={12}
             required
             value={civilId}
@@ -58,14 +68,26 @@ export default function LoginPage() {
           <span className="text-sm font-bold" style={{ color: 'var(--idh-ink-2)' }}>
             كلمة المرور
           </span>
-          <input
-            type="password"
+          <PasswordInput
+            name="password"
             className="mt-1 w-full p-3 border outline-none"
-            style={{ borderRadius: 'var(--idh-r-md)', borderColor: 'var(--idh-silver)' }}
+            style={inputStyle}
+            autoComplete="current-password"
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+        </label>
+
+        <label className="flex items-center gap-2 text-sm cursor-pointer" style={{ color: 'var(--idh-ink-2)' }}>
+          <input
+            type="checkbox"
+            className="w-4 h-4"
+            style={{ accentColor: 'var(--idh-navy-900)' }}
+            checked={remember}
+            onChange={(e) => setRemember(e.target.checked)}
+          />
+          تذكرني
         </label>
 
         {error && (
