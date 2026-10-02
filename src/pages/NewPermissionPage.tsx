@@ -33,6 +33,12 @@ export default function NewPermissionPage() {
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
+  function handleCancel() {
+    // Go back to wherever the user came from; fall back to home if this page was opened directly.
+    if (window.history.length > 1) navigate(-1)
+    else navigate('/', { replace: true })
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setError(null)
@@ -155,9 +161,14 @@ export default function NewPermissionPage() {
           </p>
         )}
 
-        <IdhButton type="submit" variant="primary" size="lg" block loading={submitting}>
-          حفظ الإذن
-        </IdhButton>
+        <div className="space-y-3">
+          <IdhButton type="submit" variant="primary" size="lg" block loading={submitting}>
+            حفظ الإذن
+          </IdhButton>
+          <IdhButton type="button" variant="secondary" size="lg" block disabled={submitting} onClick={handleCancel}>
+            إلغاء
+          </IdhButton>
+        </div>
       </form>
     </AppShell>
   )
