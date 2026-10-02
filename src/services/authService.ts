@@ -63,6 +63,14 @@ export async function changePassword(params: { currentPassword: string; newPassw
   if (error) throw new AuthServiceError(error.message)
 }
 
+/** The signed-in user's full name, or null if there's no session / profile. */
+export async function getMyFullName(): Promise<string | null> {
+  const { data: userData } = await supabase.auth.getUser()
+  if (!userData.user) return null
+  const { data } = await supabase.from('profiles').select('full_name').eq('id', userData.user.id).maybeSingle()
+  return data?.full_name ?? null
+}
+
 /** Permanently deletes the current user's account and all their data (cascades in the DB). */
 export async function deleteMyAccount() {
   const { error } = await supabase.rpc('delete_my_account')

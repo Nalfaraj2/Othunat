@@ -3,10 +3,18 @@ import { Link, useNavigate } from 'react-router-dom'
 import { AppShell } from '../components/AppShell'
 import { IdhFab } from '../brand/Button'
 import { Icon } from '../brand/Icon'
+import { getMyFullName } from '../services/authService'
 import { getMonthlyBalance, listPermissions } from '../services/permissionsService'
 import type { MonthlyBalance, Permission } from '../types/database'
 
 const today = new Date()
+
+// "نورا صلاح العبدالله" -> "نورا العبدالله" (first + last word); a single word stays as is.
+function shortName(fullName: string | null): string | null {
+  const parts = (fullName ?? '').trim().split(/\s+/).filter(Boolean)
+  if (parts.length === 0) return null
+  return parts.length === 1 ? parts[0] : `${parts[0]} ${parts[parts.length - 1]}`
+}
 const MONTH_NAMES = [
   'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
   'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر',
@@ -17,8 +25,10 @@ export default function DashboardPage() {
   const [balance, setBalance] = useState<MonthlyBalance | null>(null)
   const [recent, setRecent] = useState<Permission[]>([])
   const [loading, setLoading] = useState(true)
+  const [name, setName] = useState<string | null>(null)
 
   useEffect(() => {
+    getMyFullName().then((n) => setName(shortName(n))).catch(() => {})
     Promise.all([getMonthlyBalance(today.getFullYear(), today.getMonth() + 1), listPermissions()])
       .then(([b, list]) => {
         setBalance(b)
@@ -39,7 +49,7 @@ export default function DashboardPage() {
       <div className="space-y-5">
         <div>
           <h1 className="text-xl font-extrabold" style={{ color: 'var(--idh-navy-900)' }}>
-            مرحبًا بك 👋
+            {name ? `أهلاً ${name}` : 'أهلاً بك'} 👋
           </h1>
           <p className="text-sm" style={{ color: 'var(--idh-ink-2)' }}>
             {MONTH_NAMES[today.getMonth()]} {today.getFullYear()}
