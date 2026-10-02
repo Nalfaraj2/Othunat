@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">إذونات</string>
+    <string name="title_activity_main">إذونات</string>
+    <string name="package_name">com.idhonat.app</string>
+    <string name="custom_url_scheme">com.idhonat.app</string>
+</resources>

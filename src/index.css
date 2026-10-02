@@ -1,0 +1,10 @@
+@import "tailwindcss";
+@import "./brand/fonts.css";
+@import "./brand/tokens.css";
+
+body {
+  margin: 0;
+  font-family: var(--idh-font);
+  background: var(--idh-mist);
+  color: var(--idh-ink);
+}

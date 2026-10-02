@@ -1,0 +1,96 @@
+/* ============================================================
+   أذونات — Design Tokens v1.0
+   Font: Tajawal (Arabic + Latin). Direction: RTL first.
+   ============================================================ */
+:root {
+  /* Brand */
+  --idh-navy-900: #0B1F44;   /* Primary. CMYK 100/85/35/45 · Pantone 2767 C */
+  --idh-navy-800: #12295A;   /* Pressed */
+  --idh-navy-700: #1A3566;   /* Hover / gradients */
+  --idh-navy-500: #3C5A8F;   /* Links, focus ring (AA on white) */
+  --idh-navy-300: #8A9BBF;   /* Muted icons, placeholders */
+  --idh-silver:   #C7CDD8;   /* Borders, dividers, foil reference */
+  --idh-mist:     #EEF1F6;   /* App background */
+  --idh-white:    #FFFFFF;
+  --idh-ink:      #0B1F44;   /* Body text */
+  --idh-ink-2:    #4A5775;   /* Secondary text (7.3:1 on white) */
+
+  /* Status — all ≥ 4.5:1 on white */
+  --idh-approved: #1E7F55;  --idh-approved-bg: #E6F4EE;
+  --idh-pending:  #9A6212;  --idh-pending-bg:  #FBF1E1;
+  --idh-rejected: #B23A3A;  --idh-rejected-bg: #FBEAEA;
+
+  /* Type */
+  --idh-font: "Tajawal", "IBM Plex Sans Arabic", system-ui, sans-serif;
+  --idh-fs-display: 34px; --idh-fs-h1: 26px; --idh-fs-h2: 20px;
+  --idh-fs-body: 16px;    --idh-fs-sm: 14px; --idh-fs-xs: 12px;
+
+  /* Shape & space (4pt grid) */
+  --idh-r-sm: 10px; --idh-r-md: 14px; --idh-r-lg: 20px; --idh-r-pill: 999px;
+  --idh-btn-h-lg: 56px; --idh-btn-h-md: 48px; --idh-btn-h-sm: 36px;
+  --idh-shadow-1: 0 1px 2px rgba(11,31,68,.08), 0 4px 12px rgba(11,31,68,.06);
+  --idh-shadow-2: 0 8px 24px rgba(11,31,68,.18);
+  --idh-focus: 0 0 0 3px var(--idh-white), 0 0 0 5px var(--idh-navy-500);
+}
+
+/* ---------------- Buttons ---------------- */
+.idh-btn{
+  font-family:var(--idh-font); font-weight:700; font-size:var(--idh-fs-body);
+  display:inline-flex; align-items:center; justify-content:center; gap:10px;
+  height:var(--idh-btn-h-md); padding:0 22px; border-radius:var(--idh-r-md);
+  border:1.5px solid transparent; cursor:pointer; user-select:none; white-space:nowrap;
+  transition:background .15s, border-color .15s, transform .08s, box-shadow .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.idh-btn svg{width:20px;height:20px;flex:none}
+.idh-btn:focus-visible{outline:none;box-shadow:var(--idh-focus)}
+.idh-btn:active{transform:scale(.98)}
+.idh-btn[disabled],.idh-btn[aria-disabled="true"]{cursor:not-allowed;transform:none}
+
+.idh-btn--lg{height:var(--idh-btn-h-lg);padding:0 28px;font-size:17px;border-radius:16px}
+.idh-btn--sm{height:var(--idh-btn-h-sm);padding:0 14px;font-size:var(--idh-fs-sm);border-radius:var(--idh-r-sm);gap:6px}
+.idh-btn--sm svg{width:16px;height:16px}
+.idh-btn--block{width:100%}
+
+.idh-btn--primary{background:var(--idh-navy-900);color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.12),var(--idh-shadow-1)}
+.idh-btn--primary:hover{background:var(--idh-navy-700)}
+.idh-btn--primary:active{background:var(--idh-navy-800)}
+.idh-btn--primary[disabled]{background:#C9D0DD;color:#fff;box-shadow:none}
+
+.idh-btn--secondary{background:#fff;color:var(--idh-navy-900);border-color:var(--idh-navy-900)}
+.idh-btn--secondary:hover{background:var(--idh-mist)}
+.idh-btn--secondary[disabled]{color:#A3ADC2;border-color:#D5DAE4;background:#fff}
+
+.idh-btn--ghost{background:transparent;color:var(--idh-navy-900)}
+.idh-btn--ghost:hover{background:rgba(11,31,68,.06)}
+.idh-btn--ghost[disabled]{color:#A3ADC2}
+
+.idh-btn--approve{background:var(--idh-approved);color:#fff}
+.idh-btn--approve:hover{background:#186B47}
+.idh-btn--reject{background:#fff;color:var(--idh-rejected);border-color:var(--idh-rejected)}
+.idh-btn--reject:hover{background:var(--idh-rejected-bg)}
+
+.idh-btn--on-navy{background:#fff;color:var(--idh-navy-900)}
+.idh-btn--on-navy:hover{background:var(--idh-mist)}
+.idh-btn--outline-on-navy{background:transparent;color:#fff;border-color:rgba(255,255,255,.55)}
+.idh-btn--outline-on-navy:hover{background:rgba(255,255,255,.08)}
+
+.idh-btn--icon{width:var(--idh-btn-h-md);padding:0;border-radius:var(--idh-r-pill)}
+.idh-btn--icon.idh-btn--sm{width:var(--idh-btn-h-sm)}
+.idh-fab{width:64px;height:64px;padding:0;border-radius:22px;box-shadow:var(--idh-shadow-2)}
+.idh-fab svg{width:28px;height:28px}
+
+.idh-spinner{width:18px;height:18px;border-radius:50%;border:2.5px solid currentColor;border-inline-end-color:transparent;animation:idh-spin .7s linear infinite}
+@keyframes idh-spin{to{transform:rotate(360deg)}}
+
+/* ---------------- Status chips ---------------- */
+.idh-chip{font-family:var(--idh-font);font-weight:700;font-size:13px;display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 12px;border-radius:var(--idh-r-pill)}
+.idh-chip::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.idh-chip--approved{color:var(--idh-approved);background:var(--idh-approved-bg)}
+.idh-chip--pending{color:var(--idh-pending);background:var(--idh-pending-bg)}
+.idh-chip--rejected{color:var(--idh-rejected);background:var(--idh-rejected-bg)}
+
+/* ---------------- Segmented control ---------------- */
+.idh-seg{display:inline-flex;background:var(--idh-mist);padding:4px;border-radius:var(--idh-r-md);gap:4px;font-family:var(--idh-font)}
+.idh-seg button{font:inherit;font-weight:700;font-size:14px;border:0;background:transparent;color:var(--idh-ink-2);height:38px;padding:0 16px;border-radius:10px;cursor:pointer}
+.idh-seg button[aria-pressed="true"]{background:var(--idh-navy-900);color:#fff;box-shadow:var(--idh-shadow-1)}
