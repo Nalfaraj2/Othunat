@@ -1,8 +1,9 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { IdhButton } from '../brand/Button'
 import { AppShell } from '../components/AppShell'
 import { FilePicker } from '../components/FilePicker'
+import { getAppSettings } from '../services/adminService'
 import {
   attachPhotoToPermission,
   createMedicalPermission,
@@ -29,10 +30,22 @@ export default function NewPermissionPage() {
   const [date, setDate] = useState(today)
   const [entryTime, setEntryTime] = useState('')
   const [exitTime, setExitTime] = useState('')
+  const [workStart, setWorkStart] = useState('06:55')
   const [notes, setNotes] = useState('')
   const [photo, setPhoto] = useState<File | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [workWindow, setWorkWindow] = useState({ from: '06:55', to: '07:40' })
+
+  useEffect(() => {
+    getAppSettings()
+      .then((settings) => {
+        const from = settings.flex_floor.slice(0, 5)
+        setWorkWindow({ from, to: settings.flex_ceiling.slice(0, 5) })
+        setWorkStart(from)
+      })
+      .catch(() => {})
+  }, [])
 
   function handleCancel() {
     // Go back to wherever the user came from; fall back to home if this page was opened directly.
@@ -54,6 +67,7 @@ export default function NewPermissionPage() {
           permissionDate: date,
           entryTime,
           exitTime: type === 'end_of_day' ? exitTime : undefined,
+          workStartTime: type === 'morning' ? workStart : undefined,
         })
         if (photo) {
           const storagePath = await uploadPhoto(photo)
@@ -101,6 +115,24 @@ export default function NewPermissionPage() {
               onChange={(e) => setDate(e.target.value)}
             />
           </label>
+
+          {type === 'morning' && (
+            <label className="block">
+              <span className="text-sm font-bold" style={labelStyle}>
+                وقت بداية الدوام (مرن: من {workWindow.from} إلى {workWindow.to})
+              </span>
+              <input
+                type="time"
+                required
+                min={workWindow.from}
+                max={workWindow.to}
+                className="mt-1 w-full p-3 border outline-none"
+                style={inputStyle}
+                value={workStart}
+                onChange={(e) => setWorkStart(e.target.value)}
+              />
+            </label>
+          )}
 
           {type !== 'medical' && (
             <label className="block">

@@ -19,6 +19,7 @@ export interface Permission {
   permission_month: number
   entry_time: string // HH:MM:SS
   exit_time: string | null
+  work_start_time: string | null // HH:MM:SS, morning permissions only
   duration_minutes: number
   status: PermissionStatus
   fingerprint_record_id: string | null
