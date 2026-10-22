@@ -1,8 +1,9 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { IdhButton } from '../brand/Button'
 import { AppShell } from '../components/AppShell'
 import { FilePicker } from '../components/FilePicker'
+import { getAppSettings } from '../services/adminService'
 import {
   attachPhotoToPermission,
   createMedicalPermission,
@@ -33,6 +34,13 @@ export default function NewPermissionPage() {
   const [photo, setPhoto] = useState<File | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [workStart, setWorkStart] = useState('06:55')
+
+  useEffect(() => {
+    getAppSettings()
+      .then((settings) => setWorkStart(settings.standard_start.slice(0, 5)))
+      .catch(() => {})
+  }, [])
 
   function handleCancel() {
     // Go back to wherever the user came from; fall back to home if this page was opened directly.
@@ -101,6 +109,20 @@ export default function NewPermissionPage() {
               onChange={(e) => setDate(e.target.value)}
             />
           </label>
+
+          {type === 'morning' && (
+            <label className="block">
+              <span className="text-sm font-bold" style={labelStyle}>وقت بداية الدوام</span>
+              <input
+                type="time"
+                readOnly
+                tabIndex={-1}
+                className="mt-1 w-full p-3 border outline-none"
+                style={{ ...inputStyle, background: 'var(--idh-mist)', color: 'var(--idh-ink-2)' }}
+                value={workStart}
+              />
+            </label>
+          )}
 
           {type !== 'medical' && (
             <label className="block">
