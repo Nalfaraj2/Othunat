@@ -24,6 +24,7 @@ export async function createPermission(params: {
   permissionDate: string // YYYY-MM-DD
   entryTime: string // HH:MM
   exitTime?: string // HH:MM, required for end_of_day
+  workStartTime?: string // HH:MM, morning only: chosen start inside the flexible window
 }): Promise<Permission> {
   const { data: userData } = await supabase.auth.getUser()
   if (!userData.user) throw new PermissionsServiceError('يجب تسجيل الدخول أولًا')
@@ -38,6 +39,7 @@ export async function createPermission(params: {
       permission_date: params.permissionDate,
       entry_time: params.entryTime,
       exit_time: params.exitTime ?? null,
+      work_start_time: params.permissionType === 'morning' ? params.workStartTime ?? null : null,
       duration_minutes: 0,
     })
     .select('*')

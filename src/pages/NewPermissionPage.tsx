@@ -30,6 +30,7 @@ export default function NewPermissionPage() {
   const [date, setDate] = useState(today)
   const [entryTime, setEntryTime] = useState('')
   const [exitTime, setExitTime] = useState('')
+  const [workStart, setWorkStart] = useState('06:55')
   const [notes, setNotes] = useState('')
   const [photo, setPhoto] = useState<File | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -38,9 +39,11 @@ export default function NewPermissionPage() {
 
   useEffect(() => {
     getAppSettings()
-      .then((settings) =>
-        setWorkWindow({ from: settings.flex_floor.slice(0, 5), to: settings.flex_ceiling.slice(0, 5) }),
-      )
+      .then((settings) => {
+        const from = settings.flex_floor.slice(0, 5)
+        setWorkWindow({ from, to: settings.flex_ceiling.slice(0, 5) })
+        setWorkStart(from)
+      })
       .catch(() => {})
   }, [])
 
@@ -64,6 +67,7 @@ export default function NewPermissionPage() {
           permissionDate: date,
           entryTime,
           exitTime: type === 'end_of_day' ? exitTime : undefined,
+          workStartTime: type === 'morning' ? workStart : undefined,
         })
         if (photo) {
           const storagePath = await uploadPhoto(photo)
@@ -114,14 +118,18 @@ export default function NewPermissionPage() {
 
           {type === 'morning' && (
             <label className="block">
-              <span className="text-sm font-bold" style={labelStyle}>وقت بداية الدوام (مرن)</span>
+              <span className="text-sm font-bold" style={labelStyle}>
+                وقت بداية الدوام (مرن: من {workWindow.from} إلى {workWindow.to})
+              </span>
               <input
-                type="text"
-                readOnly
-                tabIndex={-1}
+                type="time"
+                required
+                min={workWindow.from}
+                max={workWindow.to}
                 className="mt-1 w-full p-3 border outline-none"
-                style={{ ...inputStyle, background: 'var(--idh-mist)', color: 'var(--idh-ink-2)' }}
-                value={`من ${workWindow.from} إلى ${workWindow.to}`}
+                style={inputStyle}
+                value={workStart}
+                onChange={(e) => setWorkStart(e.target.value)}
               />
             </label>
           )}
