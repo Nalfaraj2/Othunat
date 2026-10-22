@@ -34,11 +34,13 @@ export default function NewPermissionPage() {
   const [photo, setPhoto] = useState<File | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
-  const [workStart, setWorkStart] = useState('06:55')
+  const [workWindow, setWorkWindow] = useState({ from: '06:55', to: '07:40' })
 
   useEffect(() => {
     getAppSettings()
-      .then((settings) => setWorkStart(settings.standard_start.slice(0, 5)))
+      .then((settings) =>
+        setWorkWindow({ from: settings.flex_floor.slice(0, 5), to: settings.flex_ceiling.slice(0, 5) }),
+      )
       .catch(() => {})
   }, [])
 
@@ -112,14 +114,14 @@ export default function NewPermissionPage() {
 
           {type === 'morning' && (
             <label className="block">
-              <span className="text-sm font-bold" style={labelStyle}>وقت بداية الدوام</span>
+              <span className="text-sm font-bold" style={labelStyle}>وقت بداية الدوام (مرن)</span>
               <input
-                type="time"
+                type="text"
                 readOnly
                 tabIndex={-1}
                 className="mt-1 w-full p-3 border outline-none"
                 style={{ ...inputStyle, background: 'var(--idh-mist)', color: 'var(--idh-ink-2)' }}
-                value={workStart}
+                value={`من ${workWindow.from} إلى ${workWindow.to}`}
               />
             </label>
           )}
