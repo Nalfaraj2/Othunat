@@ -48,6 +48,31 @@ export async function createPermission(params: {
   return unwrap(res)
 }
 
+export async function getPermission(id: string): Promise<Permission> {
+  const res = await supabase.from('permissions').select('*').eq('id', id).single()
+  return unwrap(res)
+}
+
+// duration_minutes and work_start_time are recomputed (and clamped) server-side on every UPDATE,
+// and the monthly balance is refreshed by the after-write trigger — the client never sets them.
+export async function updatePermission(
+  id: string,
+  params: { permissionDate: string; entryTime: string; exitTime?: string; workStartTime?: string },
+): Promise<Permission> {
+  const res = await supabase
+    .from('permissions')
+    .update({
+      permission_date: params.permissionDate,
+      entry_time: params.entryTime,
+      exit_time: params.exitTime ?? null,
+      work_start_time: params.workStartTime ?? null,
+    })
+    .eq('id', id)
+    .select('*')
+    .single()
+  return unwrap(res)
+}
+
 export async function cancelPermission(id: string): Promise<void> {
   const res = await supabase.from('permissions').update({ status: 'cancelled' }).eq('id', id).select('id').single()
   unwrap(res)

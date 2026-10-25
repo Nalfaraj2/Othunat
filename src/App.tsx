@@ -53,6 +53,14 @@ export default function App() {
             }
           />
           <Route
+            path="/permissions/:id/edit"
+            element={
+              <RequireAuth>
+                <NewPermissionPage />
+              </RequireAuth>
+            }
+          />
+          <Route
             path="/profile"
             element={
               <RequireAuth>

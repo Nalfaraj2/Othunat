@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { IdhButton } from '../brand/Button'
 import { AppShell } from '../components/AppShell'
 import { FilePicker } from '../components/FilePicker'
@@ -8,6 +8,8 @@ import {
   attachPhotoToPermission,
   createMedicalPermission,
   createPermission,
+  getPermission,
+  updatePermission,
   PermissionsServiceError,
   uploadPhoto,
 } from '../services/permissionsService'
@@ -26,6 +28,8 @@ const labelStyle = { color: 'var(--idh-ink-2)' }
 
 export default function NewPermissionPage() {
   const navigate = useNavigate()
+  const { id: editId } = useParams<{ id: string }>()
+  const isEdit = Boolean(editId)
   const [type, setType] = useState<FormType>('morning')
   const [date, setDate] = useState(today)
   const [entryTime, setEntryTime] = useState('')
@@ -35,6 +39,7 @@ export default function NewPermissionPage() {
   const [photo, setPhoto] = useState<File | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [loadingEdit, setLoadingEdit] = useState(isEdit)
   const [workWindow, setWorkWindow] = useState({ from: '06:55', to: '07:40' })
 
   useEffect(() => {
@@ -47,6 +52,20 @@ export default function NewPermissionPage() {
       .catch(() => {})
   }, [])
 
+  useEffect(() => {
+    if (!editId) return
+    getPermission(editId)
+      .then((p) => {
+        if (p.permission_type === 'morning' || p.permission_type === 'end_of_day') setType(p.permission_type)
+        setDate(p.permission_date)
+        setEntryTime(p.entry_time.slice(0, 5))
+        setExitTime(p.exit_time ? p.exit_time.slice(0, 5) : '')
+        if (p.work_start_time) setWorkStart(p.work_start_time.slice(0, 5))
+      })
+      .catch(() => setError('تعذّر تحميل الإذن'))
+      .finally(() => setLoadingEdit(false))
+  }, [editId])
+
   function handleCancel() {
     // Go back to wherever the user came from; fall back to home if this page was opened directly.
     if (window.history.length > 1) navigate(-1)
@@ -58,7 +77,14 @@ export default function NewPermissionPage() {
     setError(null)
     setSubmitting(true)
     try {
-      if (type === 'medical') {
+      if (editId) {
+        await updatePermission(editId, {
+          permissionDate: date,
+          entryTime,
+          exitTime: type === 'end_of_day' ? exitTime : undefined,
+          workStartTime: type === 'morning' ? workStart : undefined,
+        })
+      } else if (type === 'medical') {
         const storagePath = photo ? await uploadPhoto(photo) : undefined
         await createMedicalPermission({ permissionDate: date, notes: notes || undefined, storagePath })
       } else {
@@ -86,9 +112,16 @@ export default function NewPermissionPage() {
     <AppShell>
       <form onSubmit={handleSubmit} className="space-y-5">
         <h1 className="text-xl font-extrabold" style={{ color: 'var(--idh-navy-900)' }}>
-          إضافة إذن
+          {isEdit ? 'تعديل الإذن' : 'إضافة إذن'}
         </h1>
 
+        {isEdit && (
+          <span className="idh-chip idh-chip--pending" style={{ color: 'var(--idh-navy-900)', background: 'var(--idh-mist)' }}>
+            {TYPE_LABELS[type]}
+          </span>
+        )}
+
+        {!isEdit && (
         <div className="idh-seg w-full">
           {(Object.keys(TYPE_LABELS) as FormType[]).map((t) => (
             <button
@@ -102,6 +135,13 @@ export default function NewPermissionPage() {
             </button>
           ))}
         </div>
+        )}
+
+        {loadingEdit && (
+          <p className="text-sm" style={labelStyle}>
+            ...جارٍ التحميل
+          </p>
+        )}
 
         <div className="bg-white p-4 space-y-4" style={{ borderRadius: 'var(--idh-r-lg)', boxShadow: 'var(--idh-shadow-1)' }}>
           <label className="block">
@@ -175,12 +215,14 @@ export default function NewPermissionPage() {
             </label>
           )}
 
+          {!isEdit && (
           <div>
             <span className="text-sm font-bold block mb-1" style={labelStyle}>
               مرفق إثبات (اختياري) {type !== 'medical' && '— صورة البصمة'}
             </span>
             <FilePicker file={photo} onChange={setPhoto} />
           </div>
+          )}
         </div>
 
         {error && (
@@ -190,8 +232,8 @@ export default function NewPermissionPage() {
         )}
 
         <div className="space-y-3">
-          <IdhButton type="submit" variant="primary" size="lg" block loading={submitting}>
-            حفظ الإذن
+          <IdhButton type="submit" variant="primary" size="lg" block loading={submitting} disabled={loadingEdit}>
+            {isEdit ? 'حفظ التعديل' : 'حفظ الإذن'}
           </IdhButton>
           <IdhButton type="button" variant="secondary" size="lg" block disabled={submitting} onClick={handleCancel}>
             إلغاء
