@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './hooks/useAuth'
 import AboutPage from './pages/AboutPage'
 import AdminPage from './pages/AdminPage'
 import DashboardPage from './pages/DashboardPage'
+import FlexHoursPage from './pages/FlexHoursPage'
 import LoginPage from './pages/LoginPage'
 import NewPermissionPage from './pages/NewPermissionPage'
 import PermissionsPage from './pages/PermissionsPage'
@@ -57,6 +58,14 @@ export default function App() {
             element={
               <RequireAuth>
                 <NewPermissionPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/flex-hours"
+            element={
+              <RequireAuth>
+                <FlexHoursPage />
               </RequireAuth>
             }
           />
