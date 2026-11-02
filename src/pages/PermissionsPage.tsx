@@ -33,12 +33,6 @@ const TYPE_ICON: Record<Permission['permission_type'], IconName> = {
 
 const hhmm = (t: string) => t.slice(0, 5)
 
-// 489 -> "08:09" (same HH:MM style the official Diwan screen uses)
-function minutesToHours(total: number): string {
-  const m = Math.max(0, total)
-  return `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`
-}
-
 function timesLabel(p: Permission): string {
   if (p.permission_type === 'morning') {
     return p.work_start_time
@@ -137,10 +131,10 @@ export default function PermissionsPage() {
                 </div>
                 <div className="flex justify-between text-xs" style={{ color: 'var(--idh-ink-2)' }}>
                   <span>
-                    مستخدم <b style={{ color: 'var(--idh-navy-900)' }}>{used}</b> د ({minutesToHours(used)} ساعة)
+                    مستخدم <b style={{ color: 'var(--idh-navy-900)' }}>{used}</b> د
                   </span>
                   <span>
-                    متبقي <b style={{ color: 'var(--idh-navy-900)' }}>{Math.max(0, total - used)}</b> د ({minutesToHours(total - used)} ساعة)
+                    متبقي <b style={{ color: 'var(--idh-navy-900)' }}>{Math.max(0, total - used)}</b> د
                   </span>
                 </div>
               </div>
