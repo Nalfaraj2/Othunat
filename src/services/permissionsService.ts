@@ -11,10 +11,21 @@ function unwrap<T>({ data, error }: { data: T | null; error: { message: string }
   return data as T
 }
 
+// Admins can read every employee's rows (extra RLS policies), so user-facing screens must always
+// filter on the signed-in user explicitly — otherwise an admin sees (and breaks on) other people's data.
+async function currentUserId(): Promise<string> {
+  const { data } = await supabase.auth.getSession()
+  const id = data.session?.user.id
+  if (!id) throw new PermissionsServiceError('يجب تسجيل الدخول أولًا')
+  return id
+}
+
 export async function listPermissions(): Promise<Permission[]> {
+  const userId = await currentUserId()
   const res = await supabase
     .from('permissions')
     .select('*')
+    .eq('user_id', userId)
     .order('permission_date', { ascending: false })
   return unwrap(res) ?? []
 }
@@ -83,10 +94,18 @@ export async function deletePermission(id: string): Promise<void> {
   if (error) throw new PermissionsServiceError(error.message)
 }
 
+export async function listMonthlyBalances(): Promise<MonthlyBalance[]> {
+  const userId = await currentUserId()
+  const res = await supabase.from('monthly_balances').select('*').eq('user_id', userId)
+  return unwrap(res) ?? []
+}
+
 export async function getMonthlyBalance(year: number, month: number): Promise<MonthlyBalance | null> {
+  const userId = await currentUserId()
   const { data, error } = await supabase
     .from('monthly_balances')
     .select('*')
+    .eq('user_id', userId)
     .eq('balance_year', year)
     .eq('balance_month', month)
     .maybeSingle()
@@ -96,9 +115,11 @@ export async function getMonthlyBalance(year: number, month: number): Promise<Mo
 }
 
 export async function listMedicalPermissions(): Promise<MedicalPermission[]> {
+  const userId = await currentUserId()
   const res = await supabase
     .from('medical_permissions')
     .select('*')
+    .eq('user_id', userId)
     .order('permission_date', { ascending: false })
   return unwrap(res) ?? []
 }
