@@ -35,6 +35,21 @@ export async function isCurrentUserAdmin(): Promise<boolean> {
   return data?.role === 'admin'
 }
 
+export interface UserCounts {
+  total: number
+  admins: number
+}
+
+export async function getUserCounts(): Promise<UserCounts> {
+  const [all, admins] = await Promise.all([
+    supabase.from('profiles').select('id', { count: 'exact', head: true }),
+    supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'admin'),
+  ])
+  if (all.error) throw new AdminServiceError(all.error.message)
+  if (admins.error) throw new AdminServiceError(admins.error.message)
+  return { total: all.count ?? 0, admins: admins.count ?? 0 }
+}
+
 export async function getAppSettings(): Promise<AppSettings> {
   const { data, error } = await supabase.from('app_settings').select('*').eq('id', true).single()
   if (error) throw new AdminServiceError(error.message)

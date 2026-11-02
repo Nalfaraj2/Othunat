@@ -5,6 +5,7 @@ import { IdhButton } from '../brand/Button'
 import {
   AdminServiceError,
   getAppSettings,
+  getUserCounts,
   isCurrentUserAdmin,
   listAllReviews,
   listAllSubscriptions,
@@ -12,6 +13,7 @@ import {
   type AdminReviewRow,
   type AdminSubscriptionRow,
   type AppSettings,
+  type UserCounts,
 } from '../services/adminService'
 
 type Tab = 'settings' | 'subscriptions' | 'reviews' | 'errors'
@@ -43,6 +45,8 @@ export default function AdminPage() {
           لوحة الأدمن
         </h1>
 
+        <UsersCountCard />
+
         <div className="idh-seg w-full">
           {TABS.map((t) => (
             <button key={t.key} type="button" className="flex-1" aria-pressed={tab === t.key} onClick={() => setTab(t.key)}>
@@ -57,6 +61,31 @@ export default function AdminPage() {
         {tab === 'errors' && <ErrorsTab />}
       </div>
     </AppShell>
+  )
+}
+
+function UsersCountCard() {
+  const [counts, setCounts] = useState<UserCounts | null>(null)
+
+  useEffect(() => {
+    getUserCounts().then(setCounts).catch(() => {})
+  }, [])
+
+  return (
+    <div
+      className="p-5 text-white flex items-center justify-between"
+      style={{ background: 'var(--idh-navy-900)', borderRadius: 'var(--idh-r-lg)', boxShadow: 'var(--idh-shadow-2)' }}
+    >
+      <div className="space-y-1">
+        <div className="text-sm opacity-80">عدد المستخدمين</div>
+        {counts && (
+          <div className="text-xs opacity-70">
+            {counts.total - counts.admins} موظفين · {counts.admins} أدمن
+          </div>
+        )}
+      </div>
+      <span className="text-4xl font-extrabold">{counts ? counts.total : '—'}</span>
+    </div>
   )
 }
 
