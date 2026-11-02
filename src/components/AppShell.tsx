@@ -6,6 +6,7 @@ import { Icon, type IconName } from '../brand/Icon'
 const NAV_ITEMS: { to: string; label: string; icon: IconName; end?: boolean }[] = [
   { to: '/', label: 'الرئيسية', icon: 'home', end: true },
   { to: '/permissions', label: 'السجل', icon: 'history' },
+  { to: '/flex-hours', label: 'الدوام المرن', icon: 'duration' },
   { to: '/profile', label: 'حسابي', icon: 'employee' },
 ]
 
