@@ -141,7 +141,7 @@ export default function FlexHoursPage() {
                   className="cursor-pointer"
                   style={
                     chosen === mins[i]
-                      ? { background: 'var(--idh-navy-900)', color: '#fff' }
+                      ? { background: 'var(--idh-approved)', color: '#fff' }
                       : { background: i % 2 === 0 ? '#fff' : 'var(--idh-mist)' }
                   }
                 >
