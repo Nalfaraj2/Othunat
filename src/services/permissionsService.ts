@@ -13,7 +13,7 @@ function unwrap<T>({ data, error }: { data: T | null; error: { message: string }
 
 // Admins can read every employee's rows (extra RLS policies), so user-facing screens must always
 // filter on the signed-in user explicitly — otherwise an admin sees (and breaks on) other people's data.
-async function currentUserId(): Promise<string> {
+export async function currentUserId(): Promise<string> {
   const { data } = await supabase.auth.getSession()
   const id = data.session?.user.id
   if (!id) throw new PermissionsServiceError('يجب تسجيل الدخول أولًا')
