@@ -81,7 +81,7 @@ export default function FlexHoursPage() {
 
         <div
           className="p-5 text-white space-y-3"
-          style={{ background: 'var(--idh-approved)', borderRadius: 'var(--idh-r-lg)', boxShadow: 'var(--idh-shadow-2)' }}
+          style={{ background: 'var(--idh-navy-900)', borderRadius: 'var(--idh-r-lg)', boxShadow: 'var(--idh-shadow-2)' }}
         >
           <div className="flex items-center justify-between text-sm opacity-80">
             <span>دوامي اليوم</span>
@@ -93,16 +93,16 @@ export default function FlexHoursPage() {
             <>
               <div className="flex items-center justify-around text-center">
                 <div>
-                  <div className="text-xs opacity-90">الدخول</div>
+                  <div className="text-xs opacity-70">الدخول</div>
                   <div className="text-3xl font-extrabold">{fmt(chosen)}</div>
                 </div>
                 <span className="text-2xl opacity-60">←</span>
                 <div>
-                  <div className="text-xs opacity-90">الخروج</div>
+                  <div className="text-xs opacity-70">الخروج</div>
                   <div className="text-3xl font-extrabold">{fmt(chosen + win.shiftMinutes)}</div>
                 </div>
               </div>
-              <div className="flex items-center justify-between text-xs opacity-90">
+              <div className="flex items-center justify-between text-xs opacity-80">
                 <span>اضغط على وقت ثاني في الجدول لتغييره</span>
                 <button type="button" className="underline font-bold" onClick={() => choose(null)}>
                   مسح
