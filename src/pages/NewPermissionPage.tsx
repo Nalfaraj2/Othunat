@@ -4,6 +4,7 @@ import { IdhButton } from '../brand/Button'
 import { AppShell } from '../components/AppShell'
 import { FilePicker } from '../components/FilePicker'
 import { getAppSettings } from '../services/adminService'
+import { getDailyEntry } from '../services/scheduleService'
 import {
   attachPhotoToPermission,
   createMedicalPermission,
@@ -40,6 +41,7 @@ export default function NewPermissionPage() {
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [loadingEdit, setLoadingEdit] = useState(isEdit)
+  const [fromSchedule, setFromSchedule] = useState(false)
   const [workWindow, setWorkWindow] = useState({ from: '06:55', to: '07:40' })
 
   useEffect(() => {
@@ -51,6 +53,26 @@ export default function NewPermissionPage() {
       })
       .catch(() => {})
   }, [])
+
+  // New morning permission: prefill the start of work with the entry time picked for that day on the
+  // flexible-hours page (the user can still change it).
+  useEffect(() => {
+    if (isEdit || type !== 'morning') {
+      setFromSchedule(false)
+      return
+    }
+    let cancelled = false
+    getDailyEntry(date)
+      .then((t) => {
+        if (cancelled) return
+        if (t) setWorkStart(t)
+        setFromSchedule(Boolean(t))
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [isEdit, type, date])
 
   useEffect(() => {
     if (!editId) return
@@ -169,8 +191,16 @@ export default function NewPermissionPage() {
                 className="mt-1 w-full p-3 border outline-none"
                 style={inputStyle}
                 value={workStart}
-                onChange={(e) => setWorkStart(e.target.value)}
+                onChange={(e) => {
+                  setWorkStart(e.target.value)
+                  setFromSchedule(false)
+                }}
               />
+              {fromSchedule && (
+                <span className="text-xs mt-1 block" style={{ color: 'var(--idh-approved)' }}>
+                  مأخوذ من دوامك المحدد لهذا اليوم في «الدوام المرن»
+                </span>
+              )}
             </label>
           )}
 
