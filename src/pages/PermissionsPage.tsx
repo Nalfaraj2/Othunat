@@ -3,7 +3,12 @@ import { Link } from 'react-router-dom'
 import { AppShell } from '../components/AppShell'
 import { Icon, type IconName } from '../brand/Icon'
 import { getAppSettings } from '../services/adminService'
-import { listMedicalPermissions, listMonthlyBalances, listPermissions } from '../services/permissionsService'
+import {
+  deletePermission,
+  listMedicalPermissions,
+  listMonthlyBalances,
+  listPermissions,
+} from '../services/permissionsService'
 import type { MedicalPermission, MonthlyBalance, Permission } from '../types/database'
 
 type Row =
@@ -53,6 +58,10 @@ export default function PermissionsPage() {
   const [balances, setBalances] = useState<MonthlyBalance[]>([])
   const [maxPermissions, setMaxPermissions] = useState(4)
   const [loading, setLoading] = useState(true)
+  // Two-tap delete: the first tap arms the button, the second one deletes.
+  const [confirmId, setConfirmId] = useState<string | null>(null)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   useEffect(() => {
     getAppSettings()
@@ -72,6 +81,34 @@ export default function PermissionsPage() {
       .finally(() => setLoading(false))
   }, [])
 
+  useEffect(() => {
+    if (!confirmId) return
+    const t = setTimeout(() => setConfirmId(null), 4000)
+    return () => clearTimeout(t)
+  }, [confirmId])
+
+  async function handleDelete(id: string) {
+    if (confirmId !== id) {
+      setConfirmId(id)
+      return
+    }
+    setDeletingId(id)
+    setDeleteError(null)
+    try {
+      await deletePermission(id)
+      setRows((prev) => prev.filter((r) => r.data.id !== id))
+      setConfirmId(null)
+      // the server recalculates the month's balance after a delete
+      listMonthlyBalances()
+        .then(setBalances)
+        .catch(() => {})
+    } catch {
+      setDeleteError('تعذّر حذف الإذن، حاول مرة ثانية')
+    } finally {
+      setDeletingId(null)
+    }
+  }
+
   const groups: MonthGroup[] = []
   for (const row of rows) {
     const key = row.data.permission_date.slice(0, 7)
@@ -90,6 +127,12 @@ export default function PermissionsPage() {
         <h1 className="text-xl font-extrabold" style={{ color: 'var(--idh-navy-900)' }}>
           سجل الأذونات
         </h1>
+
+        {deleteError && (
+          <p className="text-sm font-bold" style={{ color: 'var(--idh-rejected)' }}>
+            {deleteError}
+          </p>
+        )}
 
         {loading && (
           <p className="text-sm" style={{ color: 'var(--idh-ink-2)' }}>
@@ -188,14 +231,31 @@ export default function PermissionsPage() {
                           {timesLabel(row.data)}
                         </span>
                         {row.data.status === 'active' && (
-                          <Link
-                            to={`/permissions/${row.data.id}/edit`}
-                            className="idh-btn idh-btn--secondary idh-btn--sm"
-                            aria-label="تعديل الإذن"
-                          >
-                            <Icon name="edit" />
-                            <span>تعديل</span>
-                          </Link>
+                          <div className="flex items-center gap-2">
+                            <Link
+                              to={`/permissions/${row.data.id}/edit`}
+                              className="idh-btn idh-btn--secondary idh-btn--sm"
+                              aria-label="تعديل الإذن"
+                            >
+                              <Icon name="edit" />
+                              <span>تعديل</span>
+                            </Link>
+                            <button
+                              type="button"
+                              className="idh-btn idh-btn--sm"
+                              style={
+                                confirmId === row.data.id
+                                  ? { background: 'var(--idh-rejected)', color: '#fff', borderColor: 'var(--idh-rejected)' }
+                                  : { background: '#fff', color: 'var(--idh-rejected)', borderColor: 'var(--idh-rejected)' }
+                              }
+                              disabled={deletingId === row.data.id}
+                              aria-label={confirmId === row.data.id ? 'تأكيد حذف الإذن' : 'حذف الإذن'}
+                              onClick={() => handleDelete(row.data.id)}
+                            >
+                              <Icon name="trash" />
+                              <span>{confirmId === row.data.id ? 'تأكيد الحذف' : 'حذف'}</span>
+                            </button>
+                          </div>
                         )}
                       </div>
                     )}
