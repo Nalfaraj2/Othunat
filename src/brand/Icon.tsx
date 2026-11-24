@@ -13,6 +13,7 @@ const PATHS = {
   ),
   duration: <path d="M12 13V8.5A4.5 4.5 0 0 1 16.5 13z M12 5V3M10 3h4" />,
   add: <path d="M12 5v14M5 12h14" />,
+  trash: <path d="M4.5 7h15M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3" />,
   edit: <path d="M4 20h4L19 8.5a2.1 2.1 0 0 0-3-3L5 17zM14 7.5l3 3" />,
   'request-leave': <path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v4h-4M12 8v4l3 2" />,
   approve: <path d="M8 12.5l2.7 2.7L16.2 9.6" />,
