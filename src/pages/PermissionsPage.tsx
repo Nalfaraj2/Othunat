@@ -36,6 +36,10 @@ const TYPE_ICON: Record<Permission['permission_type'], IconName> = {
   end_of_day: 'duration',
 }
 
+// Small pill buttons for the history rows so they don't dominate the card.
+const compactBtn = { height: 28, padding: '0 10px', fontSize: 12, gap: 4, borderRadius: 8 } as const
+const compactIcon = { width: 14, height: 14 } as const
+
 const hhmm = (t: string) => t.slice(0, 5)
 
 // 489 -> "08:09" (same HH:MM style the official Diwan screen uses)
@@ -224,35 +228,37 @@ export default function PermissionsPage() {
 
                     {row.kind === 'permission' && (
                       <div
-                        className="mt-3 pt-3 flex items-center justify-between border-t"
+                        className="mt-3 pt-3 flex items-center justify-between gap-3 border-t"
                         style={{ borderColor: 'var(--idh-mist)' }}
                       >
-                        <span className="text-xs" style={{ color: 'var(--idh-ink-2)' }}>
+                        <span className="text-xs min-w-0 flex-1" style={{ color: 'var(--idh-ink-2)' }}>
                           {timesLabel(row.data)}
                         </span>
                         {row.data.status === 'active' && (
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1.5 shrink-0">
                             <Link
                               to={`/permissions/${row.data.id}/edit`}
                               className="idh-btn idh-btn--secondary idh-btn--sm"
+                              style={compactBtn}
                               aria-label="تعديل الإذن"
                             >
-                              <Icon name="edit" />
+                              <Icon name="edit" style={compactIcon} />
                               <span>تعديل</span>
                             </Link>
                             <button
                               type="button"
                               className="idh-btn idh-btn--sm"
-                              style={
-                                confirmId === row.data.id
+                              style={{
+                                ...compactBtn,
+                                ...(confirmId === row.data.id
                                   ? { background: 'var(--idh-rejected)', color: '#fff', borderColor: 'var(--idh-rejected)' }
-                                  : { background: '#fff', color: 'var(--idh-rejected)', borderColor: 'var(--idh-rejected)' }
-                              }
+                                  : { background: '#fff', color: 'var(--idh-rejected)', borderColor: 'var(--idh-rejected)' }),
+                              }}
                               disabled={deletingId === row.data.id}
                               aria-label={confirmId === row.data.id ? 'تأكيد حذف الإذن' : 'حذف الإذن'}
                               onClick={() => handleDelete(row.data.id)}
                             >
-                              <Icon name="trash" />
+                              <Icon name="trash" style={compactIcon} />
                               <span>{confirmId === row.data.id ? 'تأكيد الحذف' : 'حذف'}</span>
                             </button>
                           </div>
